@@ -10,6 +10,9 @@ syntax:expression: pattern $VAR(@) "^wg[0-9]+$" \
 
 begin: 
 	date -R >> /tmp/wg.log; echo "wireguard/node.def: begin:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log           
+    echo "wireguard/node.def:ip route show" >> /tmp/wg.log
+    ip route show >> /tmp/wg.log
+    echo "wireguard/node.def: ip route show done" >> /tmp/wg.log
     if [ "$COMMIT_ACTION" = DELETE ];
     then
         date -R >> /tmp/wg.log; echo "wireguard/node.def: begin:action: deleting" >> /tmp/wg.log
