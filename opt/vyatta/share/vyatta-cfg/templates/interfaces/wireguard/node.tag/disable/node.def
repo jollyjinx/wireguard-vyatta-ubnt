@@ -1,1 +1,4 @@
 help: Disable interface
+
+begin: date -R >> /tmp/wg.log; echo "wireguard/disable/node.def: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+

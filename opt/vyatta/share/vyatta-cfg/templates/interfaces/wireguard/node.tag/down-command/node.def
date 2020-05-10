@@ -2,3 +2,7 @@ type: txt
 help: Script or command executed before the interface goes down
 val_help: txt; Command
 val_help: txt; Executable script in /config/scripts
+
+begin: 
+	date -R >> /tmp/wg.log; echo "wireguard/down-command/node.def: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+

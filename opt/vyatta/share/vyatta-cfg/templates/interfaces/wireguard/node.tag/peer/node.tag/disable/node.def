@@ -1,6 +1,10 @@
 help: Disable peer
 
+begin:
+       date -R >> /tmp/wg.log; echo "wireguard/peer.tag/disable/node.def: begin:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+	        
 delete:
+       date -R >> /tmp/wg.log; echo "wireguard/peer.tag/disable/node.def: delete:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
        if [ -n "$VAR(../endpoint)" ]; then
          sudo wg set $VAR(../../@) peer $VAR(../@) endpoint "$VAR(../endpoint/@)"
        fi
