@@ -9,6 +9,16 @@ syntax:expression: exec "/opt/vyatta/sbin/valid_address $VAR(@)"
 
 commit:expression: exec "sudo /opt/vyatta/sbin/vyatta-interfaces.pl --valid-addr-commit $VAR(@@) --dev $VAR(../@)"
 
-create: sudo /opt/vyatta/sbin/vyatta-address add $VAR(../@) $VAR(@)
+create:
+        echo $(date|sed -e 's/\n//;') "wireguard/node.tag/address/node.def: create:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+        sudo /opt/vyatta/sbin/vyatta-address add $VAR(../@) $VAR(@)
 
-delete: sudo /opt/vyatta/sbin/vyatta-address delete $VAR(../@) $VAR(@)
+delete:
+        echo $(date|sed -e 's/\n//;') "wireguard/node.tag/address/node.def: create:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+        sudo /opt/vyatta/sbin/vyatta-address delete $VAR(../@) $VAR(@)
+
+
+begin:  echo $(date|sed -e 's/\n//;') "wireguard/node.tag/address/node.def: begin:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+end:    echo $(date|sed -e 's/\n//;') "wireguard/node.tag/address/node.def: end:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+

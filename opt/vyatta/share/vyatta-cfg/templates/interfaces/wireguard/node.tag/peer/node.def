@@ -7,39 +7,45 @@ val_help: Base64 encoded public key
 syntax:expression: pattern $VAR(@) "^[0-9a-zA-Z\+/]{43}=$" ;
 	"Key is not valid 44-character (32-bytes) base64"
 
-begin: 
-	date -R >> /tmp/wg.log; echo "wireguard/peer/node.def: begin: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
-
-delete:
-        date -R >> /tmp/wg.log; echo "wireguard/peer/node.def: delete: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
-
 commit:expression: exec "${vyatta_sbindir}/vyatta-check-allowed-ips.pl --intf $VAR(../@) --peer $VAR(@)"
 
+
+begin:  echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/node.def: begin: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+create: echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/node.def: create:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+delete: echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/node.def: delete:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+
 end:
-        date -R >> /tmp/wg.log; echo "wireguard/peer/node.def: end: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+        echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/node.def: end: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
         if [ "$COMMIT_ACTION" = DELETE ] || [ -n "$VAR(./disable)" ];
         then
           if [[ $(sudo wg show "$VAR(../@)" peers) == *"$VAR(@)"* ]]; 
           then
-            date -R >> /tmp/wg.log; echo "wireguard/peer/node.def: end.delete: $VAR(../@) route allowed: $VAR(../route-allowed-ips/@) " >> /tmp/wg.log
+            echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/node.def: end.delete: $VAR(../@) route allowed: $VAR(../route-allowed-ips/@) " >> /tmp/wg.log
             if [ "$VAR(../route-allowed-ips/@)" == "true" ];
             then
-                date -R >> /tmp/wg.log; echo "wireguard/peer/node.def: end.routeallowed" >> /tmp/wg.log
+              echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/node.def: end.routeallowed" >> /tmp/wg.log
               for allowed_ip in $(sudo wg show $VAR(../@) allowed-ips | awk '$1=="$VAR(@)" {$1=""; print $0}');
               do
-              echo echo "wireguard/peer/node.def deleting:$allowed_ip" >>/tmp/wg.log
+                echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/node.def deleting:$allowed_ip" >>/tmp/wg.log
                 sudo ip route delete "$allowed_ip"
               done
             fi
-                date -R >> /tmp/wg.log; echo "wireguard/peer/node.def: end.peer remove" >> /tmp/wg.log
+            echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/node.def: end.peer remove" >> /tmp/wg.log
             sudo wg set $VAR(../@) peer "$VAR(@)" remove
-                date -R >> /tmp/wg.log; echo "wireguard/peer/node.def: end.peer removed" >> /tmp/wg.log
+            echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/node.def: end.peer removed" >> /tmp/wg.log
           fi
         else
+          echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/node.def: setting sudo wg set $VAR(../@) peer $VAR(@)" >> /tmp/wg.log
           sudo wg set $VAR(../@) peer $VAR(@)
 
           ALLOWED=$(echo "$VAR(./allowed-ips/@)" | tr ' ' ',' | tr -d "'")
           sudo wg set $VAR(../@) peer $VAR(@) allowed-ips "$ALLOWED"
+
+          echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/node.def: sudo wg set $VAR(../@) peer $VAR(@) allowed-ips "$ALLOWED"" >> /tmp/wg.log
+
 
           if [ -n "$VAR(./persistent-keepalive)" ]; then
             sudo wg set $VAR(../@) peer $VAR(@) persistent-keepalive $VAR(./persistent-keepalive/@)

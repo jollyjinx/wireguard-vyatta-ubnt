@@ -6,3 +6,12 @@ default: true
 
 val_help: true; Enable automatically adding allowed IPs to the routing table.
 val_help: false; Disable automatically adding allowed IPs to the routing table.
+
+
+begin:  echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer.tag/route-allowed-ips/node.def: begin: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+create: echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer.tag/route-allowed-ips/node.def: create:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+end:    echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer.tag/route-allowed-ips/node.def: end:   action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+delete: echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer.tag/route-allowed-ips/node.def: delete:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log

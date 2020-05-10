@@ -1,4 +1,11 @@
 help: Disable interface
 
-begin: date -R >> /tmp/wg.log; echo "wireguard/disable/node.def: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+begin:  echo $(date|sed -e 's/\n//;') "wireguard/node.tag/disable/node.def: begin: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+create: echo $(date|sed -e 's/\n//;') "wireguard/node.tag/disable/node.def: create:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+delete: echo $(date|sed -e 's/\n//;') "wireguard/node.tag/disable/node.def: delete:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+end:    echo $(date|sed -e 's/\n//;') "wireguard/node.tag/disable/node.def: end:   action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
 

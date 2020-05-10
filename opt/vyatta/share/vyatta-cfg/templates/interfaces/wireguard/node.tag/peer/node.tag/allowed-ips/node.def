@@ -3,24 +3,19 @@ type: txt
 help: IP addresses allowed to traverse the peer
 val_help: <x.x.x.x/x | h:h:h:h:h:h:h:h>[,x.x.x.x/x | h:h:h:h:h:h:h:h]...; Comma separated list of IP addresses to allow
 
-begin:
-        date -R >> /tmp/wg.log; echo "wireguard/peer/node.tag/allowed-ips/node.def: begin: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
-
-end:
-    date -R >> /tmp/wg.log; echo "wireguard/peer/node.tag/allowed-ips/node.def: end: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
 
 delete:
-    date -R >> /tmp/wg.log; echo "wireguard/peer/node.tag/allowed-ips/node.def: delete: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+    echo $(date|sed -e 's/\n//;') "wireguard/peer/node.tag/allowed-ips/node.def: delete: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
     if [ "$VAR(../../route-allowed-ips/@)" == "true" ];
     then
-    date -R >> /tmp/wg.log; echo "wireguard/peer/node.tag/allowed-ips/node.def: delete: $VAR(@) true " >> /tmp/wg.log
+        echo $(date|sed -e 's/\n//;') "wireguard/peer/node.tag/allowed-ips/node.def: delete: $VAR(@) true " >> /tmp/wg.log
         ips="$VAR(@)"
         for ip in ${ips//,/ };
         do
-            date -R >> /tmp/wg.log; echo "wireguard/peer/node.tag/allowed-ips/node.def: delete: ip: $ip from $VAR(../../@)" >> /tmp/wg.log
-            echo "wireguard/peer/node.tag/allowed-ips/node.def:ip route show" >> /tmp/wg.log
+            echo $(date|sed -e 's/\n//;') "wireguard/peer/node.tag/allowed-ips/node.def: delete: ip: $ip from $VAR(../../@)" >> /tmp/wg.log
+            echo $(date|sed -e 's/\n//;') "wireguard/peer/node.tag/allowed-ips/node.def: delete: ip route show:" >> /tmp/wg.log
             ip route show >> /tmp/wg.log
-            echo "wireguard/peer/node.tag/allowed-ips/node.def: ip route show done" >> /tmp/wg.log
+            echo $(date|sed -e 's/\n//;') "wireguard/peer/node.tag/allowed-ips/node.def: delete: ip route show done" >> /tmp/wg.log
             sudo ip route del "$ip" dev "$VAR(../../@)" >> /tmp/wg.log 2>> /tmp/wg.log || true
         done
     fi
@@ -28,4 +23,10 @@ delete:
 
 syntax:expression: exec "ips=$VAR(@); for ip in ${ips//,/ }; do /opt/vyatta/sbin/vyatta-find-type.pl $ip ipv4net ipv4 ipv6net ipv6 > /dev/null; done || exit 1";
                    "Value must contain valid IP addresses"
+
+begin:  echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/allowed-ips/node.def: begin: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+create: echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/allowed-ips/node.def: create:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+end:    echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/allowed-ips/node.def: end:   action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
 

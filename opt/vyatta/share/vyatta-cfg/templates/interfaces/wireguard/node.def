@@ -8,50 +8,53 @@ syntax:expression: pattern $VAR(@) "^wg[0-9]+$" \
 
 
 
-begin: 
-	date -R >> /tmp/wg.log; echo "wireguard/node.def: begin:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log           
-    echo "wireguard/node.def:ip route show" >> /tmp/wg.log
+begin:
+	echo $(date|sed -e 's/\n//;') "wireguard/node.def: begin:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+    echo $(date|sed -e 's/\n//;') "wireguard/node.def:ip route show" >> /tmp/wg.log
     ip route show >> /tmp/wg.log
-    echo "wireguard/node.def: ip route show done" >> /tmp/wg.log
+    echo $(date|sed -e 's/\n//;') "wireguard/node.def: ip route show done" >> /tmp/wg.log
     if [ "$COMMIT_ACTION" = DELETE ];
     then
-        date -R >> /tmp/wg.log; echo "wireguard/node.def: begin:action: deleting" >> /tmp/wg.log
+        echo $(date|sed -e 's/\n//;') "wireguard/node.def: begin:action: deleting" >> /tmp/wg.log
         if [ "$VAR(route-allowed-ips/@)" == "true" ];
         then
+            echo $(date|sed -e 's/\n//;') "wireguard/node.def: begin:action: deleting true" >> /tmp/wg.log
             sudo ip link set down dev $VAR(@)
         fi
     fi
 
 
 create:  
-	date -R >> /tmp/wg.log; echo "wireguard/node.def: create:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log           
+    echo $(date|sed -e 's/\n//;') "wireguard/node.def: create:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
 	ip link show dev $VAR(@) &>/dev/null || sudo ip link add dev $VAR(@) type wireguard
 
+
 delete: 
-    date -R >> /tmp/wg.log; echo "wireguard/node.def: delete:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+    echo $(date|sed -e 's/\n//;') "wireguard/node.def: delete:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
     eval "$VAR(down-command/@)" >/dev/null || exit 1;
     sudo ip link del dev $VAR(@)
 
+
 end:
-    date -R >> /tmp/wg.log; echo "wireguard/node.def: end:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+    echo $(date|sed -e 's/\n//;') "wireguard/node.def: end:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
     if [ "$COMMIT_ACTION" != DELETE ];
     then
-        date -R >> /tmp/wg.log; echo "wireguard/node.def: end: no delete: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+        echo $(date|sed -e 's/\n//;') "wireguard/node.def: end: no delete: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
         eval "$VAR(down-command/@) >/dev/null" || exit 1;
         sudo ip link set down dev $VAR(@)
         if [ ! -n "$VAR(./disable)" ];
         then
-          date -R >> /tmp/wg.log; echo "wireguard/node.def: end: disable" >> /tmp/wg.log
+          echo $(date|sed -e 's/\n//;')" wireguard/node.def: end: disable" >> /tmp/wg.log
           sudo ip link set up dev $VAR(@)
           eval "$VAR(up-command/@) >/dev/null" || exit 1;
           if [ "$VAR(route-allowed-ips/@)" == "true" ];
           then
-            date -R >> /tmp/wg.log; echo "wireguard/node.def: end: route-allowed-ips" >> /tmp/wg.log
+            echo $(date|sed -e 's/\n//;')" wireguard/node.def: end: route-allowed-ips" >> /tmp/wg.log
 
             [ -n "$VAR(./route-table)" ] && tnum="$VAR(./route-table/@)"
             for i in $(sudo wg show $VAR(@) allowed-ips | sed 's/^.*\t//;s/ /\n/g' | sort -nr -k 2 -t /);
             do
-             date -R >> /tmp/wg.log; echo "wireguard/node.def: end: i:$i" >> /tmp/wg.log
+             echo $(date|sed -e 's/\n//;')" wireguard/node.def: end: i:$i" >> /tmp/wg.log
              if [ $i == "(none)" ];
              then
                 continue;
@@ -61,6 +64,7 @@ end:
           fi
         fi
      fi
+
 
 commit:expression: $VAR(./private-key) != "" ;
 	"Private key must be specified for $VAR(@)"

@@ -1,10 +1,16 @@
 help: Disable peer
 
-begin:
-       date -R >> /tmp/wg.log; echo "wireguard/peer.tag/disable/node.def: begin:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
-	        
+begin:  echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer.tag/disable/node.def: begin: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+create: echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer.tag/disable/node.def: create:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+end:    echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer.tag/disable/node.def: end:   action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+
+
+
 delete:
-       date -R >> /tmp/wg.log; echo "wireguard/peer.tag/disable/node.def: delete:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+       echo $(date|sed -e 's/\n//;')  "wireguard/node.tag/peer.tag/disable/node.def: delete:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
        if [ -n "$VAR(../endpoint)" ]; then
+         echo $(date|sed -e 's/\n//;')  "wireguard/node.tag/peer.tag/disable/node.def: -n $VAR(../endpoint) is true" >> /tmp/wg.log
          sudo wg set $VAR(../../@) peer $VAR(../@) endpoint "$VAR(../endpoint/@)"
        fi
