@@ -13,26 +13,21 @@ begin:
     echo $(date|sed -e 's/\n//;') "wireguard/node.def:ip route show" >> /tmp/wg.log
     ip route show >> /tmp/wg.log
     echo $(date|sed -e 's/\n//;') "wireguard/node.def: ip route show done" >> /tmp/wg.log
-    if [ "$COMMIT_ACTION" = DELETE ];
-    then
-        echo $(date|sed -e 's/\n//;') "wireguard/node.def: begin:action: deleting" >> /tmp/wg.log
-        if [ "$VAR(route-allowed-ips/@)" == "true" ];
-        then
-            echo $(date|sed -e 's/\n//;') "wireguard/node.def: begin:action: deleting true" >> /tmp/wg.log
-            sudo ip link set down dev $VAR(@)
-        fi
-    fi
 
 
 create:  
     echo $(date|sed -e 's/\n//;') "wireguard/node.def: create:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
 	ip link show dev $VAR(@) &>/dev/null || sudo ip link add dev $VAR(@) type wireguard
 
-
 delete: 
-    echo $(date|sed -e 's/\n//;') "wireguard/node.def: delete:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+    echo $(date|sed -e 's/\n//;') "wireguard/node.def: delete:action: $COMMIT_ACTION arg: $VAR(@) eval $VAR(down-command/@) " >> /tmp/wg.log
     eval "$VAR(down-command/@)" >/dev/null || exit 1;
+    echo $(date|sed -e 's/\n//;') "wireguard/node.def: sudo ip link del dev $VAR(@)" >> /tmp/wg.log
     sudo ip link del dev $VAR(@)
+    echo $(date|sed -e 's/\n//;') "wireguard/node.def: delete:action ip route show" >> /tmp/wg.log
+    ip route show >> /tmp/wg.log
+    echo $(date|sed -e 's/\n//;') "wireguard/node.def: delete:action  ip route show done" >> /tmp/wg.log
+
 
 
 end:

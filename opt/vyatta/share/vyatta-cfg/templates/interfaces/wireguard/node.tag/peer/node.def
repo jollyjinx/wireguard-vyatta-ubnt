@@ -10,7 +10,7 @@ syntax:expression: pattern $VAR(@) "^[0-9a-zA-Z\+/]{43}=$" ;
 commit:expression: exec "${vyatta_sbindir}/vyatta-check-allowed-ips.pl --intf $VAR(../@) --peer $VAR(@)"
 
 
-begin:  echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/node.def: begin: action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
+begin:  echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/node.def: begin: action: $COMMIT_ACTION arg: $VAR(@) arg2: $VAR(@@)" >> /tmp/wg.log
 
 create: echo $(date|sed -e 's/\n//;') "wireguard/node.tag/peer/node.def: create:action: $COMMIT_ACTION arg: $VAR(@)" >> /tmp/wg.log
 

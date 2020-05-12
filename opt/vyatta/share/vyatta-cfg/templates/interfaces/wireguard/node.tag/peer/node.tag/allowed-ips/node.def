@@ -10,13 +10,16 @@ delete:
     then
         echo $(date|sed -e 's/\n//;') "wireguard/peer/node.tag/allowed-ips/node.def: delete: $VAR(@) true " >> /tmp/wg.log
         ips="$VAR(@)"
-        for ip in ${ips//,/ };
+        for route in $(sudo ip route |awk '$3=="$VAR(../../@)" { print $1 } ')
         do
-            echo $(date|sed -e 's/\n//;') "wireguard/peer/node.tag/allowed-ips/node.def: delete: ip: $ip from $VAR(../../@)" >> /tmp/wg.log
-            echo $(date|sed -e 's/\n//;') "wireguard/peer/node.tag/allowed-ips/node.def: delete: ip route show:" >> /tmp/wg.log
-            ip route show >> /tmp/wg.log
-            echo $(date|sed -e 's/\n//;') "wireguard/peer/node.tag/allowed-ips/node.def: delete: ip route show done" >> /tmp/wg.log
-            sudo ip route del "$ip" dev "$VAR(../../@)" >> /tmp/wg.log 2>> /tmp/wg.log || true
+            for ip in ${ips//,/ };
+            do
+                if [[ $route = $ip ]];
+                then
+                    echo $(date|sed -e 's/\n//;') "wireguard/peer/node.tag/allowed-ips/node.def: delete: would delete: $route $ip dev $wginterface" >> /tmp/wg.log
+                    sudo ip route del "$ip" dev "$VAR(../../@)" >> /tmp/wg.log 2>> /tmp/wg.log
+                fi
+            done
         done
     fi
 
